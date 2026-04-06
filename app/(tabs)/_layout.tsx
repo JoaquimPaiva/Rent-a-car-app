@@ -6,7 +6,7 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 
 const IOSNativeTabs = () => {
   return (
-    <NativeTabs minimizeBehavior='onScrollDown'>
+    <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: 'rectangle.3.offgrid', selected: 'rectangle.3.offgrid.fill' }} />
         <Label>Home</Label>
