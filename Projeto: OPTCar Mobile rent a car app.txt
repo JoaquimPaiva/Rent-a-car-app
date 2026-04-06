@@ -1,0 +1,337 @@
+Projeto: OPTCar Mobile (reconstrução completa do zero)
+
+Quero que cries um novo projeto React Native com Expo Router e TypeScript, replicando integralmente a app de gestão de rent-a-car descrita abaixo.
+Implementa tudo de forma funcional, limpa, modular e pronta para produção.
+
+================================================================
+1) OBJETIVO
+================================================================
+Construir uma app mobile chamada "OptCar" para gestão operacional de rent-a-car:
+- Autenticação (login/registo/logout) com Firebase Auth.
+- CRUD completo de Veículos.
+- CRUD completo de Contratos.
+- Finalização de contratos (receção/devolução), movendo de ativos para finalizados.
+- Listagens em tempo real via Firebase Realtime Database.
+- Dashboard com KPIs.
+- Modo claro/escuro com persistência local.
+- Navegação por tabs, com unstable native tabs no iOS.
+
+================================================================
+2) STACK E VERSÕES (compatibilidade alvo)
+================================================================
+- expo ~54.0.33
+- react 19.1.0
+- react-native 0.81.5
+- expo-router ~6.0.23
+- firebase ^12.11.0
+- nativewind ^4.2.3
+- tailwindcss ^3.4.19
+- @react-native-async-storage/async-storage ^2.2.0
+- react-native-reanimated ~4.1.1
+- react-native-worklets 0.5.1
+- typescript ~5.9.2
+
+Scripts:
+- start: expo start
+- android: expo run:android
+- ios: expo run:ios
+- web: expo start --web
+- typecheck: tsc --noEmit
+- postinstall: node scripts/fix-expo-router-ctx.js
+
+================================================================
+3) CONFIGURAÇÃO BASE
+================================================================
+app.json:
+- name: OptCar
+- slug: optcar-mobile
+- scheme: optcar
+- orientation: portrait
+- userInterfaceStyle: dark
+- plugins: ["expo-router", "expo-font"]
+- experiments.typedRoutes: true
+
+babel.config.js:
+- presets: ['babel-preset-expo', 'nativewind/babel']
+
+tailwind.config.js:
+- presets: [require('nativewind/preset')]
+- content:
+  - ./app/**/*.{js,jsx,ts,tsx}
+  - ./components/**/*.{js,jsx,ts,tsx}
+  - ./lib/**/*.{js,jsx,ts,tsx}
+
+metro.config.js:
+- usar getDefaultConfig do expo e withNativeWind.
+- incluir resolveRequest custom para:
+  - react-native-worklets -> node_modules/react-native-worklets/lib/module/index.js
+  - react-native-reanimated -> node_modules/react-native-reanimated/lib/module/index.js
+
+scripts/fix-expo-router-ctx.js:
+- patch pós-install dos ficheiros _ctx do expo-router, substituindo process.env.EXPO_ROUTER_APP_ROOT por '../../app'.
+
+================================================================
+4) FIREBASE (usar exatamente)
+================================================================
+Config:
+- apiKey: "AIzaSyDziuC_KtfBrZV1MDPJkqV5hQdE9VKeb88"
+- authDomain: "rent-3c304.firebaseapp.com"
+- databaseURL: "https://rent-3c304-default-rtdb.firebaseio.com"
+- projectId: "rent-3c304"
+- storageBucket: "rent-3c304.firebasestorage.app"
+- messagingSenderId: "333350818338"
+- appId: "1:333350818338:web:2c55ae54788f28a2e0b07b"
+- measurementId: "G-V0NBBY03P3"
+
+Requisitos Firebase:
+- Auth com persistência em React Native usando AsyncStorage + initializeAuth/getReactNativePersistence.
+- Realtime Database com listeners em tempo real via onValue.
+- Tratamento de erros com mensagem amigável e code quando existir.
+
+================================================================
+5) PALETA E TEMA
+================================================================
+Light:
+- primary #6C5CE7
+- primaryDark #5A4BD1
+- accent #FF7A00
+- accentLight #FFA94D
+- background #F7F8FA
+- surface #FFFFFF
+- border #EAEAF0
+- textPrimary #1A1A1A
+- textSecondary #4A4D53
+- textOnPrimary #FFFFFF
+- success #2ECC71
+- successDark #25B964
+- error #E63946
+- warning #F4A261
+- surfacePressed #F1F2F5
+- tabActive #6C5CE7
+- tabInactive #6B6F76
+
+Dark:
+- primary #8B7CFF
+- primaryDark #7568F0
+- accent #FF8C42
+- accentLight #FFB077
+- background #0F1115
+- surface #1A1D24
+- border #2A2F3A
+- textPrimary #FFFFFF
+- textSecondary #A0A4AB
+- textOnPrimary #FFFFFF
+- success #2ECC71
+- successDark #24B965
+- error #FF5A66
+- warning #F4A261
+- surfacePressed #242A33
+- tabActive #8B7CFF
+- tabInactive #A0A4AB
+
+Implementar ThemeProvider:
+- hook useAppTheme
+- persistência em AsyncStorage key: optcar.theme.mode
+- toggle claro/escuro
+
+================================================================
+6) ESTRUTURA DE PASTAS E ROTAS
+================================================================
+app/
+- _layout.tsx
+- index.tsx (redirect para /login)
+- login.tsx
+- register.tsx
+- modal.tsx
+- (tabs)/
+  - _layout.tsx
+  - index.tsx
+  - veiculos.tsx
+  - contratos.tsx
+  - orcamentos.tsx
+  - finalizados.tsx
+- veiculos/
+  - novo.tsx
+  - editar/[id].tsx
+  - detalhes/[id].tsx
+- contratos/
+  - novo.tsx
+  - editar/[id].tsx
+  - detalhes/[id].tsx
+  - rececao.tsx
+
+components/
+- Card.tsx
+- Header.tsx
+- KPI.tsx
+- LogoutButton.tsx
+- Screen.tsx
+- ThemeToggleButton.tsx
+- ui/
+  - ActionChip.tsx
+  - AppButton.tsx
+  - DetailRow.tsx
+  - EmptyState.tsx
+  - FormField.tsx
+  - InlineMessage.tsx
+  - LinkButton.tsx
+  - StatusBadge.tsx
+
+hooks/
+- useAuth.tsx
+- useAppTheme.tsx
+
+lib/
+- auth.ts
+- firebase.ts
+- realtime.ts
+- theme.ts
+- number.ts
+- debug.ts
+
+================================================================
+7) NAVEGAÇÃO E GUARDA DE AUTENTICAÇÃO
+================================================================
+Em app/_layout.tsx:
+- envolver app com ThemeProvider e AuthProvider.
+- Stack com todas as rotas acima.
+- Guard de auth:
+  - se não autenticado e fora de /login ou /register -> redirect /login
+  - se autenticado e em /login ou /register -> redirect /(tabs)
+
+Em app/(tabs)/_layout.tsx:
+- iOS: usar expo-router/unstable-native-tabs (NativeTabs + Trigger + Label + Icon SF Symbols).
+- Android/Web: usar Tabs clássico com Ionicons.
+
+================================================================
+8) MODELOS DE DADOS E FUNÇÕES (lib/realtime.ts)
+================================================================
+Tipos:
+- Vehicle, Contract, ContractDetails, Quote, DashboardStats
+- VehicleFormData, ContractFormData
+
+Nós do Realtime Database:
+- veiculos
+- alugueres
+- alugueres_terminados
+- orcamentos
+
+Operações:
+- listVehiclesOnce
+- getVehicleById
+- createVehicle
+- updateVehicle
+- getContractById
+- getFinishedContractById
+- createContract
+- updateContract
+- finalizeContract (move de alugueres -> alugueres_terminados e remove ativo)
+- subscribeVehicles
+- subscribeContracts
+- subscribeFinishedContracts
+- subscribeQuotes
+- subscribeDashboardStats
+
+Regras de mapping:
+- Normalização robusta de payload (strings/números opcionais)
+- Fallbacks de nomes/status para evitar crash
+- Mensagens de erro legíveis
+
+================================================================
+9) TELAS E FUNCIONALIDADES
+================================================================
+Login:
+- campos email/password
+- botão entrar
+- link para registo
+- mensagens de erro de auth
+
+Register:
+- nome/email/password
+- botão criar conta
+- link para login
+
+Dashboard:
+- KPIs: totalVeiculos, totalContratosAbertos, totalContratosFinalizados, totalOrcamentos
+- ações rápidas (novo veículo, novo contrato, receção)
+- contratos recentes
+- estado de sincronização
+
+Veículos:
+- listagem em tempo real
+- novo veículo
+- ver detalhes
+- editar
+- estado (badge)
+
+Contratos:
+- listagem em tempo real
+- novo contrato
+- registar receção
+- ver detalhes
+- editar
+
+Orçamentos:
+- listagem em tempo real
+- cliente, valor estimado, status
+
+Finalizados:
+- listagem em tempo real de contratos encerrados
+- ver detalhes
+
+Receção:
+- inputs: contractId, kmEntrada, combustivelEntrada, danos, notas
+- botão finalizar contrato
+- sucesso/erro
+
+Detalhes (veículo/contrato):
+- visualização read-only com DetailRow
+
+Edição e criação:
+- todos os campos necessários
+- validações mínimas obrigatórias
+
+================================================================
+10) COMPONENTES UI (comportamento esperado)
+================================================================
+- Screen: SafeArea + ScrollView (keyboardShouldPersistTaps='handled').
+- Card: superfície padrão com borda e sombra leve.
+- Header: title, subtitle, right slot + ThemeToggleButton.
+- ThemeToggleButton: alterna tema e persiste.
+- LogoutButton: termina sessão e redireciona login.
+- AppButton: variants primary/success/secondary, disabled state.
+- FormField: label, icon, multiline, editable state.
+- StatusBadge: neutral/success/warning/danger/brand.
+- InlineMessage: info/error/success.
+- EmptyState, ActionChip, DetailRow, LinkButton.
+
+================================================================
+11) REQUISITOS DE QUALIDADE
+================================================================
+- TypeScript estrito, sem any desnecessário.
+- Sem quebrar UX entre iOS/Android/web.
+- Acessibilidade básica em botões e mensagens.
+- Código modular e reutilizável.
+- Não remover funcionalidades existentes.
+- Manter comportamento consistente com os fluxos descritos.
+
+================================================================
+12) CRITÉRIOS DE ACEITAÇÃO (done)
+================================================================
+- Projeto arranca com `npx expo start -c`.
+- Login/registo funcionam no Firebase real.
+- Listagens carregam dados em tempo real sem erro.
+- CRUD de veículos e contratos funcional.
+- Receção finaliza contrato corretamente.
+- Tabs funcionam com NativeTabs no iOS.
+- Dark mode com memória funcionando entre sessões.
+- Typecheck sem erros.
+
+================================================================
+13) OUTPUT ESPERADO DO AGENTE
+================================================================
+Quero que cries todos os ficheiros necessários, já com código final funcional, e no fim entregues:
+1) Estrutura final de pastas.
+2) Lista dos ficheiros criados/alterados.
+3) Comandos para correr o projeto.
+4) Checklist de validação funcional.

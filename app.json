@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "OptCar",
+    "slug": "optcar-mobile",
+    "scheme": "optcar",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

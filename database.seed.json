@@ -1,0 +1,36 @@
+{
+  "veiculos": {
+    "veh_demo_1": {
+      "marca": "Renault",
+      "modelo": "Clio",
+      "matricula": "AA-11-BB",
+      "ano": 2022,
+      "km": 30150,
+      "combustivel": "Gasolina",
+      "status": "disponivel",
+      "notas": "Viatura de demonstracao"
+    }
+  },
+  "alugueres": {
+    "ctr_demo_1": {
+      "clienteNome": "Cliente Demo",
+      "clienteNif": "123456789",
+      "veiculoId": "veh_demo_1",
+      "dataInicio": "2026-04-06",
+      "dataFimPrevista": "2026-04-10",
+      "valorTotal": 199.9,
+      "status": "aberto",
+      "notas": "Contrato inicial de teste",
+      "kmSaida": 30150,
+      "combustivelSaida": "Cheio"
+    }
+  },
+  "alugueres_terminados": {},
+  "orcamentos": {
+    "orc_demo_1": {
+      "cliente": "Empresa Demo",
+      "valorEstimado": 540,
+      "status": "pendente"
+    }
+  }
+}

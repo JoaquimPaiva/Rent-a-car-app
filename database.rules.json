@@ -1,0 +1,51 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "veiculos": {
+      ".indexOn": ["status", "matricula"],
+      "$vehicleId": {
+        ".validate": "newData.hasChildren(['marca','modelo','matricula'])",
+        "marca": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "modelo": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "matricula": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "ano": { ".validate": "newData.isNumber() || !newData.exists()" },
+        "km": { ".validate": "newData.isNumber() || !newData.exists()" },
+        "combustivel": { ".validate": "newData.isString() || !newData.exists()" },
+        "status": { ".validate": "newData.isString() || !newData.exists()" },
+        "notas": { ".validate": "newData.isString() || !newData.exists()" }
+      }
+    },
+    "alugueres": {
+      ".indexOn": ["status", "veiculoId", "clienteNome"],
+      "$contractId": {
+        ".validate": "newData.hasChildren(['clienteNome','veiculoId','dataInicio'])",
+        "clienteNome": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "clienteNif": { ".validate": "newData.isString() || !newData.exists()" },
+        "veiculoId": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "dataInicio": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "dataFimPrevista": { ".validate": "newData.isString() || !newData.exists()" },
+        "valorTotal": { ".validate": "newData.isNumber() || !newData.exists()" },
+        "status": { ".validate": "newData.isString() || !newData.exists()" },
+        "notas": { ".validate": "newData.isString() || !newData.exists()" },
+        "kmSaida": { ".validate": "newData.isNumber() || !newData.exists()" },
+        "combustivelSaida": { ".validate": "newData.isString() || !newData.exists()" }
+      }
+    },
+    "alugueres_terminados": {
+      ".indexOn": ["status", "dataFinalizacao", "clienteNome"],
+      "$contractId": {
+        ".validate": "newData.hasChildren(['clienteNome','veiculoId'])"
+      }
+    },
+    "orcamentos": {
+      ".indexOn": ["status", "cliente"],
+      "$quoteId": {
+        ".validate": "newData.hasChildren(['cliente'])",
+        "cliente": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "valorEstimado": { ".validate": "newData.isNumber() || !newData.exists()" },
+        "status": { ".validate": "newData.isString() || !newData.exists()" }
+      }
+    }
+  }
+}
