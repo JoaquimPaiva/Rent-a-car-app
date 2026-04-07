@@ -15,6 +15,8 @@ O projeto foi pensado para centralizar a operacao diaria de uma empresa de alugu
 - Tema claro/escuro com persistencia local.
 - Navegacao por tabs, incluindo `unstable-native-tabs` no iOS.
 
+![Descrição da imagem](./exemple.jpg)
+
 ## Principais Funcionalidades
 
 ### Autenticacao
